@@ -10,7 +10,7 @@ import java.util.Map;
 // and concatenates the each string contained with-in the cell map 
 
 public class OddMagicCypher extends MagicCypher {
-    
+
     // message we are trying to encrypt
     protected String message;
     
@@ -24,8 +24,6 @@ public class OddMagicCypher extends MagicCypher {
     protected ArrayList<ArrayList<Map<Integer, String>>> square = new ArrayList<>();
 
     
-
-
     // constructor
     OddMagicCypher( int order, 
                     ArrayList<Map<Integer, String>> charMapList,
@@ -37,6 +35,7 @@ public class OddMagicCypher extends MagicCypher {
         this.square = square;
 
     }
+
 
     protected String generateCypher(){
         // this is the main method responsible for generating the cypher
@@ -76,6 +75,8 @@ public class OddMagicCypher extends MagicCypher {
      
     public void printSquare(){
         // print the square
+
+        System.out.println(square.size());
         
         for(int i = 0 ; i < order ; i++){
             // print out each row of the square 
@@ -163,6 +164,8 @@ public class OddMagicCypher extends MagicCypher {
 
         }
 
+        // System.out.println("inside odd magic Cypher's buildSquare method");
+
         System.out.println("\n");
         
         // for testing purposes to see how the square looks
@@ -171,9 +174,6 @@ public class OddMagicCypher extends MagicCypher {
         System.out.println("\n");
         
         // inherited from parent
-
-        // test's the magic square to see if it has all the magic properties 
-        isMagic(square);
 
         return square;
 

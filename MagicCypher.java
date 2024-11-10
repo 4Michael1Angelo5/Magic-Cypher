@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class MagicCypher {
 
+    // ************************************************************************************************
+
     // order of magic square
     protected int order;
     // ciphered message
@@ -27,9 +29,11 @@ public class MagicCypher {
     public ArrayList<Map<Integer, String>> charMapList = new ArrayList<>();
 
     // ledger of what's been added to our orignal message we are trying to encrypt.
-    protected Map<Integer,String> ledgerMap = new HashMap<>();
+    protected Map<Integer, String> ledgerMap = new HashMap<>();
 
-    // ===============main method testing=============
+    // *************************************************************************************************
+
+    // main method testing
 
     public static void main(String[] args) {
         // MagicCypher myCypher = new MagicCypher();
@@ -37,10 +41,9 @@ public class MagicCypher {
         // System.out.print(myCypher.message);
 
         File file = new File("message.txt");
-
-        MagicCypher cipher2 = new  MagicCypher();
+        MagicCypher cipher2 = new MagicCypher();
         cipher2.encryptMessage(file);
-        System.out.println("\n"+cipher2.message +"\n");    
+        System.out.println(cipher2.message);
     }
 
     // =============== setters ========================
@@ -49,12 +52,38 @@ public class MagicCypher {
         this.message = message;
     }
 
+    protected void setSquare(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
+        this.square = magicSquare;
+    }
+
+    protected void setOrder(int order) {
+        this.order = order;
+    }
+
+    // ============== empty constructor ==========================
+
+    // MagicCypher(){
+    // // empty constructor to test what's happening to our fields
+    // // between state updates initiated by its children.
+
+    // System.out.println("inside parent calss constructor: \n");
+    // System.out.println(this.order +"\n");
+
+    // System.out.println("inside parent calss constructor: \n ");
+
+    // System.out.println(square);
+
+    // System.out.println("inside parent calss constructor: \n");
+
+    // System.out.println(message);
+    // }
+
     // =============== meat and potatoes ======================
 
     private String encryptMessage(String message) {
 
         // 1) remove any leading or trailing white space
-        message = message.trim(); 
+        message = message.trim();
 
         // 2) determine the order of a square matrix that can fit the message
         this.order = calculateOrder(message.length());
@@ -79,204 +108,78 @@ public class MagicCypher {
     // same as above but for files
     private String encryptMessage(File file) {
 
-        // 1) read the message
+        // 0) read the message
         String readMessage = readFile(file);
 
-        // 2 remove any leading or trailing white space
+        // 1 remove any leading or trailing white space
         readMessage = readMessage.trim();
 
-        // 3) calculate the order of a square matrix that can fit our message
+        // 2) calculate the order of a square matrix that can fit our message
         this.order = calculateOrder(readMessage.length());
 
-        // 4) sanitize the message to get ready for encryption
+        // 3) sanitize the message to get ready for encryption
         String scrubedMessage = sanitizeMessage(readMessage);
-        setMessage(scrubedMessage); 
+        setMessage(scrubedMessage);
 
-        // 5) create a character map containng the values of each char in the message
+        // 4) create a character map containng the values of each char in the message
         // and their index
         generateCharMap(scrubedMessage);
 
-        // 6) create an matrix with empty maps in each cell
+        // 5) create an matrix with empty maps in each cell
         createEmptyMatrix(order);
 
-        // 7) determine approriate child class to handle encryption:
+        // 5) determine approriate child class to handle encryption:
         determineCypherAlgorithm();
 
         return scrubedMessage;
     }
+    // ========== steps  ============
 
-    // ==============================helper methods==================
+    // step 0)
 
-    // calculatMagicConstant;
-    protected double calculateMagicConstant(double order) {
+    // Helper method for MagicCypher to read file input
+    private String readFile(File file) {
 
-        double n = order;
+        String message = "";
+        String lineBreak;
 
-        return n * (n * n + 1) / 2;
+        try {
+            // Create a Scanner object to read the file
+            Scanner scanner = new Scanner(file);
 
-    }
-
-    // test's children classes encryption algorithms to make sure they have magic
-    // properties
-    protected boolean isMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
-        
-        // this method loops through each row and column of the array list
-        // and iterates over every key in the list and adds them up to see if they equal the magic constant
-        // then it checks the two diagonals to see if they equal the magic constant
-        // if all tests pass then it returns true.
-        // if one of the sums don't equal the magic constant then it thows an illegal state exception;
-
-
-        Map<Integer, String> cellInColumn = new HashMap<>();
-        Map<Integer, String> cellInRow = new HashMap<>();
-
-        int sumRow;
-        int sumColumn;
-        double magicConstant = calculateMagicConstant(magicSquare.size());
-        for (int i = 0; i < magicSquare.size(); i++) {
-
-            sumRow = 0;
-            sumColumn = 0; 
-
-            for (int j = 0; j < magicSquare.size(); j++) {
-
-                // rows
-                cellInRow = magicSquare.get(i).get(j); // returns a map
-
-                // columns
-                cellInColumn = magicSquare.get(j).get(i); // returns a map
-
-                // add up all the keys in each row
-
-                // get the key in each cell @TODO can this be faster if I know there is always
-                // only one map in each column
-                for (Integer key : cellInRow.keySet()) {
-                    // the keys represnt the index of the char in the string
-                    // because they are zero indexed we need to add 1 to each key
-                    sumRow += key + 1;
+            // Read the file line by line
+            while (scanner.hasNextLine()) {
+                if (scanner.hasNextLine()) {
+                    // adjust for line breaks
+                    lineBreak = " ";
+                } else {
+                    lineBreak = "";
                 }
 
-                // add up all the keys in each column
-                for (Integer key : cellInColumn.keySet()) {
-                    // the keys represnt the index of the char in the string
-                    // because they are zero indexed we need to add 1 to each key
-                    sumColumn += key + 1;
+                String line = scanner.nextLine();
 
-                }
+                // add a white space between
+                // lines other wise:
+                // Hello
+                // World
+                // Becomes "HelloWorld" instead of "Hello World"
 
+                // concatenate
+                message += line + lineBreak;
             }
 
-            if( sumRow != magicConstant){
-                // if the sum in a row is not equal to the magic constant then the algorithm was not performed 
-                // correctly 
+            // close the scanner
+            scanner.close();
 
-                throw new IllegalStateException("Row: "+ (i+1) +" does not equal the magic constant " );
-            
-            }
-            if( sumColumn != magicConstant){
-                // if the sum in a column is not equal to the magic constant then the algorithm was not performed 
-                // correctly 
-
-                throw new IllegalStateException("column: "+ (i+1) +" does not equal the magic constant " );
-
-            }
-
-            
-
-        }
-        if(!isDiagonalsMagic(magicSquare, magicConstant)){
-    
-            throw new IllegalStateException("one of the diagonals does not equal the magic constant " );
-        }
-
-        System.out.println("magic cypher algorithm performed correctly!");
-
-        
-        // if all these tests passed then the encryption algorithm was performed correctly
-        return true;
-    }
-
-    private boolean isDiagonalsMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare,double magicConstant){
-
-        //tests to see if the 2 diagonals of the square sum to the magic constant
-        // if they do it returns true, otherwise it return false;
-
-        // row
-        int i = 0;
-
-        // column
-        int j = 0; 
-
-    
-        Map<Integer,String> cellLeft = new HashMap<>();
-        Map<Integer,String> cellRight = new HashMap<>();
-
-        int sumLeftDiagonal = 0; 
-        int sumRightDiagonal= 0;
-
-        int N = magicSquare.size();
-
-        while(i<magicSquare.size()){
-            
-            // move from top left to bottom right diagonally
-            cellLeft = magicSquare.get(i).get(j);
-
-            // move from top right to bottom left diagonally 
-            cellRight = magicSquare.get(i).get(N-j-1);
-            
-            // sum up the key's in each cell
-            for(Integer key: cellLeft.keySet()){
-
-                // the keys represent the index of the char in the messge
-                // bc they are zero indexed we need to adjust by + 1 to 
-                // to check their magic properties            
-
-                sumLeftDiagonal+=key+1;
-            }
-
-            for(Integer key: cellRight.keySet()){
-
-                // the keys represent the index of the char in the messge
-                // bc they are zero indexed we need to adjust by + 1 to 
-                // to check their magic properties 
-
-                sumRightDiagonal+=key+1;
-            }
-
-            i++;
-            j++;
-        }
-        
-        // if one of the diagonals does not equal the magic constant then return false
-        if(sumLeftDiagonal!=magicConstant || sumRightDiagonal!= magicConstant){
-        
-            return false;
-        }
-        //otherwise 
-        return true; 
-    } 
-
-    private String determineCypherAlgorithm() {
-
-        if (order % 2 == 0) {
-
-            if (order % 4 == 0) {
-                System.out.println("that's a double even magic square ");
-            } else {
-                System.out.println("that's a singly even magic square");
-            }
-        } else if (order % 2 == 1) {
-            OddMagicCypher oddCypher = new OddMagicCypher(order, charMapList, square);
-            String cypheredText = oddCypher.generateCypher();
-
-            // update the message field and overwrite original input with cipher
-            setMessage(cypheredText);
-            // System.out.println(cypheredText);
+            // deal with not being able to find the file
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
         }
 
         return message;
-
     }
+
+    // step 2)
 
     private int calculateOrder(int lengthOfMessage) {
 
@@ -299,55 +202,7 @@ public class MagicCypher {
 
     }
 
-    private void generateCharMap(String message) {
-        // updates charMap field
-        // arraylist of maps containing:
-        // key: index of char in message
-        // value: char in message
-
-        int index = 0;
-
-        while (index < message.length()) {
-
-            Map<Integer, String> charMap = new HashMap<>();
-
-            charMap.put(index, "" + message.charAt(index));
-
-            charMapList.add(charMap);
-
-            index++;
-        }
-
-        // System.out.println(charMapList);
-    }
-
-    private void createEmptyMatrix(int order) {
-        // create an empty matrix to be passed off to children
-        // arrayList (row) of arrayList (column) of maps (cell)
-
-        for (int i = 0; i < order; i++) {
-
-            ArrayList<Map<Integer, String>> row = new ArrayList<>();
-
-            for (int j = 0; j < order; j++) {
-
-                // create an empty map in each cell
-                // to use for comparison purposes in children classes
-                // to determine occupancy
-
-                Map<Integer, String> cell = new HashMap<>();
-
-                row.add(cell);
-
-            }
-
-            square.add(row);
-
-        }
-
-    }
-
-
+    // step 3)
 
     private String sanitizeMessage(String message) {
         // clean up the message to get ready for encryption
@@ -393,47 +248,293 @@ public class MagicCypher {
         return tempMessage;
     }
 
-    // Helper method for MagicCypher with file input
-    private String readFile(File file) {
+    // step 4)
 
-        String message = "";
-        String lineBreak;
+    private void generateCharMap(String message) {
+        // updates charMap field
+        // arraylist of maps containing:
+        // key: index of char in message
+        // value: char in message
 
-        try {
-            // Create a Scanner object to read the file
-            Scanner scanner = new Scanner(file);
+        int index = 0;
 
-            // Read the file line by line
-            while (scanner.hasNextLine()) {
-                if (scanner.hasNextLine()) {
-                    // adjust for line breaks
-                    lineBreak = " ";
-                } else {
-                    lineBreak = "";
-                }
+        while (index < message.length()) {
 
-                String line = scanner.nextLine();
+            Map<Integer, String> charMap = new HashMap<>();
 
-                // add a white space between
-                // lines other wise:
-                // Hello
-                // World
-                // Becomes "HelloWorld" instead of "Hello World"
+            charMap.put(index, "" + message.charAt(index));
 
-                // concatenate
-                message += line + lineBreak;
+            charMapList.add(charMap);
+
+            index++;
+        }
+    }
+
+    // step 5
+
+    protected ArrayList<ArrayList<Map<Integer, String>>> createEmptyMatrix(int order) {
+        // create an empty matrix to be passed off to children
+        // arrayList (row) of arrayList (columns) of maps (cells)
+
+        // very important! create a temp square do not directly mutate square field
+        ArrayList<ArrayList<Map<Integer, String>>> tempSquare = new ArrayList<>();
+
+        // Note:
+
+        // do not directly mutate the "square" object. this causes unexpexted behavior
+        // when child classes
+        // call this method.
+
+        // example SinglyEvenMagicCypher calls this method 4 times to create 4 odd magic
+        // squares to build its singly even magic square
+        // with each call square's value will grow becuase it reference persists between
+        // child and parent even when you create new
+        // differnt new OddMagicCypher Object becuase they both share the same parent.
+
+        for (int i = 0; i < order; i++) {
+
+            ArrayList<Map<Integer, String>> row = new ArrayList<>();
+
+            for (int j = 0; j < order; j++) {
+
+                // create an empty map in each cell
+                // to use for comparison purposes in children classes
+                // to determine occupancy
+
+                Map<Integer, String> cell = new HashMap<>();
+
+                row.add(cell);
+
             }
 
-            // close the scanner
-            scanner.close();
+            tempSquare.add(row);
+        }
 
-            // deal with not being able to find the file
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + e.getMessage());
+        // set square field to newly created empty matrix
+        setSquare(tempSquare);
+
+        return square;
+    }
+
+    // step 6)
+
+    private String determineCypherAlgorithm() {
+
+        if (order % 2 == 0) {
+
+            if (order % 4 == 0) {
+                System.out.println("that's a double even magic square ");
+            } else {
+                System.out.println("that's a singly even magic square");
+                SinglyEvenMagicCypher singlyEvenMagicCypher = new SinglyEvenMagicCypher(order, charMapList, square);
+                String cipheredText = singlyEvenMagicCypher.generateCypher();
+                setMessage(cipheredText);
+            }
+        } else if (order % 2 == 1) {
+            OddMagicCypher oddCypher = new OddMagicCypher(order, charMapList, square);
+            String cypheredText = oddCypher.generateCypher();
+
+            // update the message field and overwrite original input with cipher
+            setMessage(cypheredText);
+            // System.out.println(cypheredText);
         }
 
         return message;
 
+    }
+
+
+    // helper methods 
+
+    // calculatMagicConstant;
+    protected double calculateMagicConstant(double order) {
+
+        double n = order;
+
+        return n * (n * n + 1) / 2;
+
+    }
+
+    // toString Method but with void return type
+    protected void printSquare(ArrayList<ArrayList<Map<Integer, String>>> square) {
+
+        System.out.println("order: " + order + " size: " + square.size());
+
+        for (int i = 0; i < square.size(); i++) {
+            // print out each row of the square
+            System.out.println(square.get(i));
+        }
+    }
+
+    // test's children classes encryption algorithms to make sure they have magic
+    // properties
+    protected boolean isMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
+
+        // this method loops through each row and column of the array list
+        // and iterates over every key in the list and adds them up to see if they equal
+        // the magic constant
+        // then it checks the two diagonals to see if they equal the magic constant
+        // if all tests pass then it returns true.
+        // if one of the sums don't equal the magic constant then it thows an illegal
+        // state exception;
+
+        Map<Integer, String> cellInColumn = new HashMap<>();
+        Map<Integer, String> cellInRow = new HashMap<>();
+
+        int sumRow;
+        int sumColumn;
+        double magicConstant = calculateMagicConstant(magicSquare.size());
+        for (int i = 0; i < magicSquare.size(); i++) {
+
+            sumRow = 0;
+            sumColumn = 0;
+
+            for (int j = 0; j < magicSquare.size(); j++) {
+
+                // rows
+                cellInRow = magicSquare.get(i).get(j); // returns a map
+
+                // columns
+                cellInColumn = magicSquare.get(j).get(i); // returns a map
+
+                // add up all the keys in each row
+
+                // get the key in each cell @TODO can this be faster if I know there is always
+                // only one map in each column
+                for (Integer key : cellInRow.keySet()) {
+                    // the keys represnt the index of the char in the string
+                    // because they are zero indexed we need to add 1 to each key
+                    sumRow += key + 1;
+                }
+
+                // add up all the keys in each column
+                for (Integer key : cellInColumn.keySet()) {
+                    // the keys represnt the index of the char in the string
+                    // because they are zero indexed we need to add 1 to each key
+                    sumColumn += key + 1;
+
+                }
+
+            }
+
+            if (sumRow != magicConstant) {
+                // if the sum in a row is not equal to the magic constant then the algorithm was
+                // not performed
+                // correctly
+
+                throw new IllegalStateException("Row: " + (i + 1) + " does not equal the magic constant ");
+
+            }
+            if (sumColumn != magicConstant) {
+                // if the sum in a column is not equal to the magic constant then the algorithm
+                // was not performed
+                // correctly
+
+                throw new IllegalStateException("column: " + (i + 1) + " does not equal the magic constant ");
+
+            }
+
+        }
+        if (!isDiagonalsMagic(magicSquare, magicConstant)) {
+
+            throw new IllegalStateException("one of the diagonals does not equal the magic constant ");
+        }
+
+        System.out.println("magic cypher algorithm performed correctly!");
+
+        // if all these tests passed then the encryption algorithm was performed
+        // correctly
+        return true;
+    }
+    
+    // helper method for isMagic
+    private boolean isDiagonalsMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare, double magicConstant) {
+
+        // tests to see if the 2 diagonals of the square sum to the magic constant
+        // if they do it returns true, otherwise it return false;
+
+        // row
+        int i = 0;
+
+        // column
+        int j = 0;
+
+        Map<Integer, String> cellLeft = new HashMap<>();
+        Map<Integer, String> cellRight = new HashMap<>();
+
+        int sumLeftDiagonal = 0;
+        int sumRightDiagonal = 0;
+
+        int N = magicSquare.size();
+
+        while (i < magicSquare.size()) {
+
+            // move from top left to bottom right diagonally
+            cellLeft = magicSquare.get(i).get(j);
+
+            // move from top right to bottom left diagonally
+            cellRight = magicSquare.get(i).get(N - j - 1);
+
+            // sum up the key's in each cell
+            for (Integer key : cellLeft.keySet()) {
+
+                // the keys represent the index of the char in the messge
+                // bc they are zero indexed we need to adjust by + 1 to
+                // to check their magic properties
+
+                sumLeftDiagonal += key + 1;
+            }
+
+            for (Integer key : cellRight.keySet()) {
+
+                // the keys represent the index of the char in the messge
+                // bc they are zero indexed we need to adjust by + 1 to
+                // to check their magic properties
+
+                sumRightDiagonal += key + 1;
+            }
+
+            i++;
+            j++;
+        }
+
+        // if one of the diagonals does not equal the magic constant then return false
+        if (sumLeftDiagonal != magicConstant || sumRightDiagonal != magicConstant) {
+
+            return false;
+        }
+        // otherwise
+        return true;
+    }
+
+    // this method is used by all children
+    protected String readSquare(ArrayList<ArrayList<Map<Integer, String>>> square) {
+        // read each row line by line and concatenate the string values of each map
+        // to form a ciphered text
+
+        ArrayList<Map<Integer, String>> row = new ArrayList<>();
+        String cipheredText = "";
+        String nextChar;
+
+        for (int i = 0; i < order; i++) {
+
+            // row of matrix
+            row = square.get(i);
+
+            for (int j = 0; j < order; j++) {
+
+                // get the first key value of the cell in the column of row i
+                nextChar = row.get(j).entrySet().iterator().next().getValue();
+
+                // concatenate the message
+                cipheredText += nextChar;
+            }
+        }
+
+        //update message field ?? 
+
+        // return the ciphered text
+        return cipheredText;
     }
 
 }
