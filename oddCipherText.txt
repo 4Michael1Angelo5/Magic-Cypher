@@ -1,0 +1,9 @@
+Hello my name is Christopher Lee Chun. 
+I would like to show you my special program
+that I have been working on. It uses magic squares to
+encrypt messages. How cool is that. Magic squares and cubes 
+have always been a source of wonder and amazement for me. 
+I hope you find this program useful or fun. If you want to
+collaborate with me on futurue projects my github is
+4michael1angelo5.github.io. I hope to hear from y'all soon. 
+Peace!

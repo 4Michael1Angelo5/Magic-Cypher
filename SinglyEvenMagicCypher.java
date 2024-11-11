@@ -25,7 +25,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     ArrayList<Map<Integer, String>> charForLowerLeftSquare = new ArrayList<>();
     ArrayList<Map<Integer, String>> charForlowerRightSquare = new ArrayList<>();
 
-    //
+    // 4 temporary odd order squares we will combine to make one single even square
     protected ArrayList<ArrayList<Map<Integer, String>>> upperleftSquare = new ArrayList<>();
     protected ArrayList<ArrayList<Map<Integer, String>>> upperRightSquare = new ArrayList<>();
     protected ArrayList<ArrayList<Map<Integer, String>>> lowerLeftSquare = new ArrayList<>();
@@ -62,24 +62,8 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         
         // step 5 perform right side row column swap operations
         rightSideRowColumnSwapOperations();
-        
-        // test if the algorithm was performed correctly 
-        if(isMagic(magicSquare)){
-            // if this not true isMagic will throw an illegal state exception
 
-            setSquare(magicSquare);
-            //wahooo we got here! 
-            
-            // oops this is now null!
-            // System.out.println("after the isMagic check: " + this.order);
-            
-            // becuase we created 4 instances of the parent class
-            // by creating 4 instances of the OddMagicCypher without initlizing the parent 
-            // the parent class's order is now null or zero
-            // we need to reinitilize the parent classes fields 
-
-            setOrder(this.order);
-        }; 
+        // @TODO: can step 4 and 5 be combined to be more streamlined/ less redudant
 
         // step 6) now we need to read the rows line by line 
         // and out put the final cyphered text
@@ -211,8 +195,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     // combine all 4 odd magic squares
     private void combineSquares2() {
 
-        System.out.println("inside combineSquare now, order is : " + order);
-
         ArrayList<ArrayList<Map<Integer, String>>> tempSquare = new ArrayList<>();
 
         for (int i = 0; i < order; i++) {
@@ -278,11 +260,10 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
             }
 
+            // add row to tempSquare
             tempSquare.add(row);
 
         }
-
-        printSquare(tempSquare);
 
         this.magicSquare = tempSquare;
 
@@ -342,8 +323,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
         }
 
-        printSquare(tempSquare);
-
         this.magicSquare = tempSquare;
     } 
 
@@ -365,7 +344,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         //  X 0 0 0 0 0                 X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0 
         //  0 X 0 0 0 0                 X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
         //  X 0 0 0 0 0                 0 X X 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
-        //                              X X 0 0 0 0 0 0 0 0         0 X X X 0 0 0 0 0 0 0 0 0 0  <- shift over one column when i = n/4-1
+        //                              X X 0 0 0 0 0 0 0 0         0 X X X 0 0 0 0 0 0 0 0 0 0  <- shift over one column when i = n/4
         //                              X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
         //                                                          X X X 0 0 0 0 0 0 0 0 0 0 0
         //                                                          X X X 0 0 0 0 0 0 0 0 0 0 0
@@ -375,7 +354,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         //  X 0 0 0 0 0                 X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
         //  0 X 0 0 0 0                 X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
         //  X 0 0 0 0 0                 0 0 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0 
-        //                              X X 0 0 0 0 0 0 0 0         0 X X X 0 0 0 0 0 0 0 0 0 0  <- shift over one column when i = n/4-1
+        //                              X X 0 0 0 0 0 0 0 0         0 X X X 0 0 0 0 0 0 0 0 0 0  <- shift over one column when i = n/4
         //                              X X 0 0 0 0 0 0 0 0         X X X 0 0 0 0 0 0 0 0 0 0 0
         //                                                          X X X 0 0 0 0 0 0 0 0 0 0 0
         //                                                          X X X 0 0 0 0 0 0 0 0 0 0 0
@@ -399,7 +378,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
             for(int  i = 0 ; i < N/2 ;i++){
                 // rows               
 
-                if(i== (int) Math.floor(N/4) ){
+                if(i== (int) Math.floor(N/4) ){   //<----- i don't think this is neccessary
                 // special case shift over one column
 
                 // shift over one column when row is in the midle of
@@ -425,9 +404,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
             }
 
         }
-
-        System.out.println("the magic square is now: \n");
-        printSquare(magicSquare);
 
     }
 
@@ -502,8 +478,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
             }
         }  
         
-        // check to make sure it looks right
-        printSquare(magicSquare);
     }
 
     // =============================================================================

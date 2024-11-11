@@ -21,7 +21,6 @@ public class MagicCypher {
     // map
     // containing key values of an Integer (index of char in message) and a string
     // (the char in the message)
-
     public ArrayList<ArrayList<Map<Integer, String>>> square = new ArrayList<>();
 
     // a map of all the string charaters in the message and thier index posiition
@@ -40,10 +39,13 @@ public class MagicCypher {
         // myCypher.encryptMessage("Hello My");
         // System.out.print(myCypher.message);
 
-        File file = new File("message.txt");
-        MagicCypher cipher2 = new MagicCypher();
-        cipher2.encryptMessage(file);
-        System.out.println(cipher2.message);
+        // File file = new File("message.txt");
+        // MagicCypher cipher2 = new MagicCypher();
+        // cipher2.encryptMessage(file); 
+
+        File file  = new File("oddCipherText.txt");
+        MagicCypher myCipher = new MagicCypher();
+        myCipher.encryptMessage(file);
     }
 
     // =============== setters ========================
@@ -60,23 +62,8 @@ public class MagicCypher {
         this.order = order;
     }
 
-    // ============== empty constructor ==========================
+    // ============== empty constructor =======================
 
-    // MagicCypher(){
-    // // empty constructor to test what's happening to our fields
-    // // between state updates initiated by its children.
-
-    // System.out.println("inside parent calss constructor: \n");
-    // System.out.println(this.order +"\n");
-
-    // System.out.println("inside parent calss constructor: \n ");
-
-    // System.out.println(square);
-
-    // System.out.println("inside parent calss constructor: \n");
-
-    // System.out.println(message);
-    // }
 
     // =============== meat and potatoes ======================
 
@@ -101,8 +88,11 @@ public class MagicCypher {
 
         // 6) determine approriate child class to handle encryption:
         determineCypherAlgorithm();
+        
+        // 7) print the ciphered text to the comand line
+        System.out.println("your ciphered text is:\n" + "\n" + this.message + "\n");
 
-        return scrubedMessage;
+        return this.message;
     }
 
     // same as above but for files
@@ -128,10 +118,13 @@ public class MagicCypher {
         // 5) create an matrix with empty maps in each cell
         createEmptyMatrix(order);
 
-        // 5) determine approriate child class to handle encryption:
+        // 6) determine approriate child class to handle encryption:
         determineCypherAlgorithm();
 
-        return scrubedMessage;
+        // 7) print the ciphered text to the comand line
+        System.out.println("your ciphered text is:\n" + "\n" + this.message + "\n");
+
+        return this.message;
     }
     // ========== steps  ============
 
@@ -151,7 +144,8 @@ public class MagicCypher {
             while (scanner.hasNextLine()) {
                 if (scanner.hasNextLine()) {
                     // adjust for line breaks
-                    lineBreak = " ";
+                    lineBreak = " "; 
+ 
                 } else {
                     lineBreak = "";
                 }
@@ -166,6 +160,7 @@ public class MagicCypher {
 
                 // concatenate
                 message += line + lineBreak;
+                // message += line;
             }
 
             // close the scanner
@@ -175,7 +170,6 @@ public class MagicCypher {
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + e.getMessage());
         }
-
         return message;
     }
 
@@ -317,26 +311,90 @@ public class MagicCypher {
     }
 
     // step 6)
-
     private String determineCypherAlgorithm() {
+        // determin which child class to pass the encription logic off to 
+        // based on the order of the square.   
 
         if (order % 2 == 0) {
 
             if (order % 4 == 0) {
-                System.out.println("that's a double even magic square ");
+                // doubly even case
+
+                System.out.println("\nusing doubly even magic cypher\n");
+
+                // create new doubly even magic cypher to handle encryption logic 
+                DoublyEvenMagicCypher doublyEvenCypher = new DoublyEvenMagicCypher(order, square, charMapList);
+
+                // call generateCypher method to run the encryption
+                String cypheredText = doublyEvenCypher.generateCypher();
+
+                printSquare(doublyEvenCypher.magicSquare);
+                
+                // check validity of encryption algorithm
+                if(isMagic(doublyEvenCypher.magicSquare)){
+
+                    // update square state with magic square
+                    setSquare(doublyEvenCypher.magicSquare);
+
+                    // update message state with ciphered text
+                    setMessage(cypheredText);
+
+                }
+
+
             } else {
-                System.out.println("that's a singly even magic square");
+                // singly even case
+
+                System.out.println("\nusing singly even magic cypher...\n");
+                
+                // create new singly even magic cypher to handle encryption logic 
                 SinglyEvenMagicCypher singlyEvenMagicCypher = new SinglyEvenMagicCypher(order, charMapList, square);
+
+                // call generateCypher method to run the encryption
                 String cipheredText = singlyEvenMagicCypher.generateCypher();
-                setMessage(cipheredText);
+
+                printSquare(singlyEvenMagicCypher.magicSquare);
+                
+                // check validity of the encryption aglorithm
+                if(isMagic(singlyEvenMagicCypher.magicSquare)){
+                    
+                    // if its valid update square field
+                    setSquare(singlyEvenMagicCypher.magicSquare);
+
+                    // update message state with ciphered text
+                    setMessage(cipheredText);
+
+                }
+
             }
+
         } else if (order % 2 == 1) {
+            // odd case
+
+            System.out.println("\nusing odd encryption butter\n");
+
+            // create new odd Magic Cypher object to handle encryption logic
             OddMagicCypher oddCypher = new OddMagicCypher(order, charMapList, square);
+
+            // call generateCypher Method to run the encryption
             String cypheredText = oddCypher.generateCypher();
 
-            // update the message field and overwrite original input with cipher
-            setMessage(cypheredText);
-            // System.out.println(cypheredText);
+            
+            // this check needs to go here becuase I don't want 
+            // it in odd magic Cypher class becuase every time signly even Magic cypher creates a new 
+            // square the test will fail. 
+
+            printSquare(oddCypher.square);
+
+            if(isMagic(oddCypher.square)){
+
+                setSquare(oddCypher.square);
+
+                // update the message field and overwrite original input with cipherd text
+                setMessage(cypheredText); 
+            }
+
+         
         }
 
         return message;
@@ -348,6 +406,7 @@ public class MagicCypher {
 
     // calculatMagicConstant;
     protected double calculateMagicConstant(double order) {
+        // the magic constant is the number every row, column, and diagonal sum to. 
 
         double n = order;
 
@@ -358,7 +417,8 @@ public class MagicCypher {
     // toString Method but with void return type
     protected void printSquare(ArrayList<ArrayList<Map<Integer, String>>> square) {
 
-        System.out.println("order: " + order + " size: " + square.size());
+
+        // System.out.println("check inside print square, order: " + order + " size: " + square.size()); // why is order zero?
 
         for (int i = 0; i < square.size(); i++) {
             // print out each row of the square
@@ -370,6 +430,7 @@ public class MagicCypher {
     // properties
     protected boolean isMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
 
+
         // this method loops through each row and column of the array list
         // and iterates over every key in the list and adds them up to see if they equal
         // the magic constant
@@ -377,6 +438,19 @@ public class MagicCypher {
         // if all tests pass then it returns true.
         // if one of the sums don't equal the magic constant then it thows an illegal
         // state exception;
+
+        System.out.println("\nChecking the validity of the algorithm... \n ");
+
+        // @TODO implement a cool UX here where it goes step by step an shows you what its doing
+        // IDEAS: it would be cool if we set a timestamp at the begining of the function and implemented 
+        //  a loading bar using "*" or something so that a star would get printed out every half second 
+        // then it would go step by step and be like checking all rows and columns .... 
+        // now checking all diagonals .... 
+        // then print the final message which says something like algorithm perofmred corecetly.
+
+    
+        // System.out.println("checking order from insie isMagic in parent: "+this.order); 
+        //why is this zero when child classes are calling it but not when the parent calls it? 
 
         Map<Integer, String> cellInColumn = new HashMap<>();
         Map<Integer, String> cellInRow = new HashMap<>();
@@ -434,16 +508,18 @@ public class MagicCypher {
 
             }
 
+            // System.out.println("row " + (i+1) + " sum: " + sumRow); 
+            // System.out.println("column " + (i+1) + " sum: " + sumRow); 
+
         }
         if (!isDiagonalsMagic(magicSquare, magicConstant)) {
 
             throw new IllegalStateException("one of the diagonals does not equal the magic constant ");
         }
 
-        System.out.println("magic cypher algorithm performed correctly!");
-
         // if all these tests passed then the encryption algorithm was performed
         // correctly
+        System.out.println("Magic Cipher Algorithm performed correctly\n");
         return true;
     }
     
@@ -516,12 +592,12 @@ public class MagicCypher {
         String cipheredText = "";
         String nextChar;
 
-        for (int i = 0; i < order; i++) {
+        for (int i = 0; i < square.size(); i++) {
 
             // row of matrix
             row = square.get(i);
 
-            for (int j = 0; j < order; j++) {
+            for (int j = 0; j < square.size(); j++) {
 
                 // get the first key value of the cell in the column of row i
                 nextChar = row.get(j).entrySet().iterator().next().getValue();

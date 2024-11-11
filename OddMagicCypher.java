@@ -48,42 +48,17 @@ public class OddMagicCypher extends MagicCypher {
         // mapped out in the same pattern as a magic square
         // ie the first letter of the string goes where the number 1 would go
         // the second letter of the string goes where the number 2 would go etc...
+
+        // step 1)
         buildSquare();
+        
+        // step 2) 
+        String cipheredText = readSquare(square);
 
-        ArrayList<Map<Integer,String>> row = new ArrayList<>();
-        String cipheredText = "";
-        String nextChar;
-
-        for(int i = 0 ; i < order; i ++){
-
-            //row of matrix
-            row = square.get(i);
-
-            for(int j = 0 ; j < order; j++){
-                
-                // get the first key value of the cell in the column of row i 
-                nextChar = row.get(j).entrySet().iterator().next().getValue();
-
-                // concatenate the message
-                cipheredText+= nextChar;
-
-            }
-        }
-            // return the ciphered text
-            return cipheredText;
+        // step 3)  return the ciphered text
+        return cipheredText;
     }
      
-    public void printSquare(){
-        // print the square
-
-        System.out.println(square.size());
-        
-        for(int i = 0 ; i < order ; i++){
-            // print out each row of the square 
-                System.out.println(square.get(i));
-        
-        }
-    }
 
     protected ArrayList<ArrayList<Map<Integer, String>>> buildSquare() {
         // this method makes the magic square 
@@ -163,17 +138,6 @@ public class OddMagicCypher extends MagicCypher {
             indexOfChar++;
 
         }
-
-        // System.out.println("inside odd magic Cypher's buildSquare method");
-
-        System.out.println("\n");
-        
-        // for testing purposes to see how the square looks
-        printSquare();
-
-        System.out.println("\n");
-        
-        // inherited from parent
 
         return square;
 
