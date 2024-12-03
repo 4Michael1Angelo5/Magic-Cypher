@@ -35,17 +35,61 @@ public class MagicCypher {
     // main method testing
 
     public static void main(String[] args) {
-        // MagicCypher myCypher = new MagicCypher();
-        // myCypher.encryptMessage("Hello My");
-        // System.out.print(myCypher.message);
 
-        // File file = new File("message.txt");
-        // MagicCypher cipher2 = new MagicCypher();
-        // cipher2.encryptMessage(file); 
+        //odd cypher
+        MagicCypher myCypher = new MagicCypher();
+        myCypher.encryptMessage(
+                                "All you who sleep tonight " + 
+                                "Far from the ones you love, " + 
+                                "No hand to left or right " + 
+                                 "And emptiness above " + 
+                                 
+                                "Know that you aren't alone " + 
+                                "The whole world shares your tears, " + 
+                                "Some for two nights or one, " + 
+                                "And some for all their years. "
+                                );// poem by Vikram Seth
 
-        File file  = new File("oddCipherText.txt");
-        MagicCypher myCipher = new MagicCypher();
-        myCipher.encryptMessage(file);
+         System.out.println("The order of your message is: " + myCypher.order+"\n");
+
+         int key1 = (int) myCypher.calculateMagicConstant(myCypher.order);
+
+         String decryptedMessage = myCypher.decryptMessage(myCypher.message, key1);
+
+         System.out.println(decryptedMessage);
+
+         // singly even with file
+        File file = new File("ghettoScholar.txt");
+        MagicCypher cipher2 = new MagicCypher();
+
+        cipher2.encryptMessage(file);  
+
+        System.out.println("The order of your message is: " + cipher2.order + "\n");
+
+        int key = (int) cipher2.calculateMagicConstant(cipher2.order);
+
+        String decryptedMessage1 = cipher2.decryptMessage(cipher2.message,key);
+
+        System.out.println(decryptedMessage1);
+
+        //doubly even with file
+
+        File file2 = new File("message.txt");
+        MagicCypher cipher3 = new MagicCypher();
+
+        cipher3.encryptMessage(file2);  
+
+        System.out.println("The order of your message is: " + cipher3.order + "\n");
+
+        int key3 = (int) cipher3.calculateMagicConstant(cipher3.order);
+
+        String decryptedMessage2 = cipher3.decryptMessage(cipher3.message,key3);
+
+        System.out.println(decryptedMessage2);
+
+
+
+
     }
 
     // =============== setters ========================
@@ -410,16 +454,17 @@ public class MagicCypher {
 
         double n = order;
 
+
         return n * (n * n + 1) / 2;
 
     }
 
     // toString Method but with void return type
     protected void printSquare(ArrayList<ArrayList<Map<Integer, String>>> square) {
-
-
-        // System.out.println("check inside print square, order: " + order + " size: " + square.size()); // why is order zero?
-
+        
+        // NOTE: square.size() NOT "order"
+        // "order" will be undefined when singlyEvenMagicCypher creates 
+        // 4 oddMagicCyphers because it does not initlize this class before their creation
         for (int i = 0; i < square.size(); i++) {
             // print out each row of the square
             System.out.println(square.get(i));
@@ -576,7 +621,6 @@ public class MagicCypher {
 
         // if one of the diagonals does not equal the magic constant then return false
         if (sumLeftDiagonal != magicConstant || sumRightDiagonal != magicConstant) {
-
             return false;
         }
         // otherwise
@@ -607,10 +651,160 @@ public class MagicCypher {
             }
         }
 
-        //update message field ?? 
-
         // return the ciphered text
         return cipheredText;
+    }
+
+    private String determineDecryptionAlgorithm(int order, ArrayList<ArrayList<Map<Integer,String>>> square){
+        // determins which decryption algorithm to use and uses it
+        // return the decrypted message; 
+        System.out.println("Determining cipher algorithm for decryption...\n");
+ 
+        if(order%2==0){
+
+            if(order%4==0){
+                //use doubly even
+                DoublyEvenMagicCypher doublyEvenMagicCypher = new DoublyEvenMagicCypher(square);
+                String deCryptedmessage = doublyEvenMagicCypher.decyptMessage(square);
+
+                
+
+                return deCryptedmessage;
+            }else{
+                // use singly even
+
+                SinglyEvenMagicCypher singlyEvenMagicCypher = new SinglyEvenMagicCypher(order, square);
+                String deCryptedmessage = singlyEvenMagicCypher.decryptMessage(square);
+
+                
+
+                return  deCryptedmessage;
+            }
+
+        }else{
+            // use odd            
+            OddMagicCypher oddMagicCypher = new OddMagicCypher(order,square);
+            String deCryptedmessage = oddMagicCypher.decryptMessage(square);
+            //should this setState and should we have a new field for decryptedMessage?
+            return deCryptedmessage;
+        }
+
+    }
+
+    //================================================================================================
+    //decryption 
+
+    // step 1) check if the message we are trying to decrypt is a valid cipher
+    
+    // helper method determines whether or not an integer is a square number
+    private static boolean isSquare(int num){
+
+        //cast the result of sqrt(num) to an integer
+        // ie sqrt(2) = 1.41421356237 becomes 1
+        // 1*1 != 2 there for 2 is not a square number 
+        int sqrt = (int) Math.sqrt(num);
+ 
+        return sqrt*sqrt == num;
+    }
+    
+    // checks to see if the message length is a square number
+    private static boolean isValidCipher(String message) throws IllegalArgumentException{
+        // this method is used by decryptMessage to determin if a message is 
+        // a valid cipher
+
+        if(isSquare(message.length())){ 
+            return true;
+        }else{
+            throw new IllegalArgumentException("the message you are trying to decrypt is not a valid cipher");
+        }
+    }
+
+    // step 2 check if the key provided is equal to the magic constant
+
+    private  boolean isValidKey(int order ,int key){
+ 
+
+        int magicConstant = (int) calculateMagicConstant(order);
+        
+        // if the key does not match the magic constant throw IllegalAccessError
+        if(key!= magicConstant){
+            throw new IllegalAccessError("Permison not granted.\n You have provided an invalid key to access the messsage.");
+        }else{
+            return true;
+        }
+
+    }
+
+    // step 3) 
+    private static ArrayList< ArrayList< Map<Integer,String>>> stringToSquare(String message){
+        //constructs a 2d arraylist of maps cotaining the letter and index of the char in the message
+
+
+        ArrayList< ArrayList< Map<Integer,String>>> square = new ArrayList<>();
+
+        int order = (int) Math.sqrt(message.length());
+        int charIndex = 0;
+        
+        // fill the matrix from top row to bottom row, and from left column to right column
+        for(int i = 0 ; i < order ; i++){
+            ArrayList<Map<Integer,String>> row = new ArrayList<>();
+            for(int j = 0 ; j < order ; j ++){
+                //each cell is single map  
+                Map<Integer,String> cell = new HashMap<>();
+                // the char's index is the key and the char is its value
+                cell.put(charIndex, "" +message.charAt(charIndex)); //"" + to convert from char to string
+                // add the map to the row
+                row.add(cell);
+                // increase char index
+                charIndex++;
+            }
+            // add the row to the square
+            square.add(row);
+        }
+
+        return square;
+
+    }
+
+
+    protected String decryptMessage(String message,int key){
+
+        // we don't need to worry about sanitizing the string bc Magic Cypher's out put is always the 
+        // the product of a sanitized message. 
+
+        // step 1) check if the message is a valid cipher (eg. a square number)
+        if(isValidCipher(message)){
+            
+            int messageLength = message.length();
+
+            int order = (int) Math.sqrt(messageLength); 
+            
+            // step 2) check that the key is equal to the magic constant
+            if(isValidKey(order, key)){
+
+
+                // step 3) build a square to fit our encrypted message;                
+                ArrayList< ArrayList< Map<Integer,String>>> cipheredSquare = stringToSquare(message);
+
+             
+                // step 4) feed the square to determineDecryptionAlgorithm
+                String decryptedMessage = determineDecryptionAlgorithm(order, cipheredSquare);
+
+                // step 5) @TODO clean up the message if possible 
+
+                System.out.println("Your decrypted message is: \n");
+                
+                return decryptedMessage +"\n"; 
+            
+            }
+        }
+
+        //default behavior 
+        // if an invalid message is provided, return the message
+        // but it will never get here becuase if it fails the previous
+        // checks then it will throw an exception
+        return message;
+
     }
 
 }

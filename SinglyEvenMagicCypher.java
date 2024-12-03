@@ -2,18 +2,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+// Encryption:
+
+// SinglyEvenMagicCypher class produces an singly even magic square filled with
+// char's from a message. It reads each row of the square and concatenates the chars
+// to produce a ciphered text. The chars are mapped by their corresponding position
+// in the string message. IE the number 1 corresponds to the first letter in the message
+// and that letter would go where the number 1 would go in magic square. 
+
+// Decryption:
+// SinglyEvenMagicCypher also uses the same convention to decrypt messages. 
+
 // algorithm we followed https://www.1728.org/magicsq3.htm
 
 public class SinglyEvenMagicCypher extends MagicCypher {
 
-    // message we are trying to encrypt
-    protected String message;
-
     // order of the square
     protected int order;
 
-    // map (key = indexOfCharInMessage, value = charInMesage) each map can be
-    // thought of as a cell
+    // map (key = indexOfCharInMessage, value = charInMesage) each map can be thought of as a cell
     protected ArrayList<Map<Integer, String>> charMapList = new ArrayList<>();
 
     // The magic Square containing the maps ("cells")
@@ -31,7 +38,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     protected ArrayList<ArrayList<Map<Integer, String>>> lowerLeftSquare = new ArrayList<>();
     protected ArrayList<ArrayList<Map<Integer, String>>> lowerRightSquare = new ArrayList<>();
 
-    // constructor 
+    // encryption constructor 
     SinglyEvenMagicCypher(int order,
             ArrayList<Map<Integer, String>> charMapList,
             ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
@@ -44,13 +51,13 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         this.magicSquare = magicSquare;
     }
     
-    // main method
+    // encryption main method
     protected String generateCypher() {
 
         // step 1) break up the charMap List into 4 char map Lists
         splitListInto4();
 
-        // step 2) create a 4 new magic OddMagicSquare's out of the list.
+        // step 2) create 4 new OddMagicSquare's out of the list.
         create4_OddMagicSquares();
 
         // step 3) combine all the odd magic squares
@@ -140,6 +147,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     // step 2)
     // build four odd order magic squares from our char maps
     protected void create4_OddMagicSquares() {
+        //NOTE: this method directly modifies state!
 
         // build upper left square
 
@@ -176,19 +184,14 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
         lowerRightSquare = lowerRightMagicSquare.buildSquare();
 
+        // NOTE:
         // Each call to this method creates a new instance of the parent class.
-
         // Be cautious of potential side effects here. 
         // Creating a new instance of the child class OddMagicCypher without first initializing 
         // the parent class can leave some of the parent's fields as null 
         // or lead to a scenario where the state of the application is not in sync
         // ie the children classes will have differnt states then their parent
-        
-        // for example this is now null:
-        // System.out.println("inside singly even build square call: " + this.message); 
-
-        // even though we already initlized SinglyEvenMagicSquare with this.message recieved from the parent
-
+    
     }
 
     // step 3)
@@ -223,7 +226,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
                 int rowIndex = i % (order / 2);
                 // once were in the 2 quadrant (upper right square)
-                // i will be between 3 and 5 we need to fill rows 0 through 2
+                // it will be between 3 and 5 we need to fill rows 0 through 2
                 // of our odd magic square
 
                 int columnIndex = j % (order / 2);
@@ -410,6 +413,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     // step 5)
     private void rightSideRowColumnSwapOperations(){
 
+
         // right side row swaping
 
         // example of row swaping :
@@ -506,6 +510,142 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         // put the stored values from B into A
         B.put(keyFromA, valueFromA);
 
+    }
+
+    //**************************************************************************************************
+    // ******************************************Decryption*********************************************
+
+    // constructor for decryption
+    SinglyEvenMagicCypher(int order, ArrayList<ArrayList<Map<Integer,String>>> square){
+        // takes an integer,"order": order of the square eg: 6x6, 10x10
+        // and an 2d array list of maps representing a char dictionary of the message
+        
+        this.order = order;
+        this.magicSquare = square; 
+    
+    }
+        //decryption main method
+        protected String decryptMessage(ArrayList<ArrayList<Map<Integer,String>>> square){
+    
+            //step 1) perform row column swaping on left side
+            leftSideRowColumnSwapOperations(); 
+
+            //step 2) perform row column swaping on right side
+            rightSideRowColumnSwapOperations();
+
+            //step 3)  split the square into 4     
+            splitInto4Squares();
+
+            //step 4) use OddMagicCyphers decryptMessage method to read each square
+            String decryptedMessage = readSquares();
+
+            //step 5) return the result    
+            return decryptedMessage;
+        }
+    
+
+    //step 3) 
+    protected void splitInto4Squares(){
+        // the method splits a singly even square into 4 odd squares
+        // then it creates 4 oddMagicCypher Objects out of the split squares
+        // and uses the decryption process for those squares. 
+        // NOTE: this method updates state!
+        
+        // short hand 
+        int N = order;
+        
+        //clear existing state of squares if any to avoid bullshit <= (can't think of a bettter word =/ )
+        upperleftSquare.clear();
+        upperRightSquare.clear();
+        lowerLeftSquare.clear();
+        lowerRightSquare.clear();
+        
+        // initilize space to store squares
+        ArrayList<ArrayList<Map<Integer,String>>> upperLeftSquare = new ArrayList<>();
+        ArrayList<ArrayList<Map<Integer,String>>> upperRightSquare = new ArrayList<>();
+        ArrayList<ArrayList<Map<Integer,String>>> lowerLeftSquare  = new ArrayList<>();
+        ArrayList<ArrayList<Map<Integer,String>>> lowerRightSquare = new ArrayList<>();
+
+        for(int i = 0 ; i < N/2; i++){
+            //only need to itterate through half of the rows
+            
+            //create a space to store cells in each row
+            ArrayList<Map<Integer,String>> upperLeftRow = new ArrayList<>();
+            ArrayList<Map<Integer,String>> upperRightRow = new ArrayList<>();
+            ArrayList<Map<Integer,String>> lowerLeftRow = new ArrayList<>();
+            ArrayList<Map<Integer,String>> lowerRightRow = new ArrayList<>();
+
+            for(int j = 0 ; j < N ; j ++){
+                
+                //get the cells and add them to the corresponding row
+                Map<Integer,String> upperCell = magicSquare.get(i).get(j);
+
+                //get the correponding rows in the lower half of the square
+                Map<Integer,String> lowerCell = magicSquare.get(i+N/2).get(j);
+            
+                if(j<N/2){
+                    //then were in left side of the square
+                    upperLeftRow.add(upperCell);    
+                    
+                    // lower left side of the square
+                    lowerLeftRow.add(lowerCell);
+
+                }else{
+                    //otherwise we're in the right side
+                    upperRightRow.add(upperCell);
+
+                    //lower right side of the square
+                    lowerRightRow.add(lowerCell);
+                }                    
+            }
+            
+            //add each row to the squares
+            upperLeftSquare.add(upperLeftRow);
+            upperRightSquare.add(upperRightRow);
+            lowerLeftSquare.add(lowerLeftRow);
+            lowerRightSquare.add(lowerRightRow);
+
+        }
+        //setState
+        this.upperleftSquare = upperLeftSquare;
+        this.upperRightSquare = upperRightSquare;
+        this.lowerLeftSquare = lowerLeftSquare;
+        this.lowerRightSquare = lowerRightSquare;
+
+    }
+
+    protected String readSquares(){
+        // create 4 oddMagicCypher objects for us to decrypt using 
+        // OddMagicCypher's decryption constructor
+        
+        //==================== upper left square =======================================
+    
+        OddMagicCypher  upperLeftOddMagicSquare = new OddMagicCypher(order, upperleftSquare);
+        String uppleftText = upperLeftOddMagicSquare.decryptMessage(upperleftSquare);
+
+        //==================== upper right square =======================================
+
+        OddMagicCypher  upperRightOddMagicSquare = new OddMagicCypher(order, upperRightSquare);
+        String upperRightText = upperRightOddMagicSquare.decryptMessage(upperRightSquare);
+
+        //==================== lower left square =======================================
+
+        OddMagicCypher  lowerLeftOddMagicSquare = new OddMagicCypher(order, lowerLeftSquare);
+        String lowerLeftText = lowerLeftOddMagicSquare.decryptMessage(lowerLeftSquare);
+
+        //==================== lower right square =======================================
+
+        OddMagicCypher  lowerRightOddMagicCypher = new OddMagicCypher(order, lowerRightSquare);
+        String lowerRightText = lowerRightOddMagicCypher.decryptMessage(lowerRightSquare);
+
+        //recall pattern for building singly even squares is:
+
+        // A  C     A = 1:N^2/4            C = 2*N^2/4+1: 3N^2/4
+        // D  B     B = N^2/4+1 : 2*N^2/4  D = 3N^2/4+1 : N^2
+
+        //          A              B              C                 D
+        return uppleftText + lowerRightText + upperRightText + lowerLeftText;
+     
     }
 
 
