@@ -1,6 +1,15 @@
 import java.util.ArrayList; 
 import java.util.Map;
 
+// DoublyEvenMagicCypher uses an algorithm to produce doubly even order magic squares.
+// A doubly even number is number divisible by 4 but not by 2.
+// A square is represented by an arraylist of arraylist's.
+// in Each cell of the 2d ArrayList is a map. 
+// The map contains a key integer representing the index of the char in the message
+// and the value of that char. 
+// To produce the cypher, OddMagicCypher reads each row of the square 
+// and concatenates the each string contained with-in the cell map 
+
 public class DoublyEvenMagicCypher extends MagicCypher {
 
     // order of the square

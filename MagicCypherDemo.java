@@ -2,6 +2,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+// MagicCypher demonstrating extreme use cases.
 
 public class MagicCypherDemo {
 
@@ -78,7 +79,7 @@ public class MagicCypherDemo {
 	public static void main(String[] args) {
 		MagicCypherDemo demo = new MagicCypherDemo();
 		
-		// singly even test with file
+		// // singly even test with file
 		demo.startTimer("Test2");
 		File singlyEvenTest = new File("ghettoScholar.txt");
 		cypherFile(singlyEvenTest);
@@ -86,7 +87,7 @@ public class MagicCypherDemo {
 		System.out.println(String.format("%.4f seconds to cypher message.\n", demo.getTime("Test2")));
 		
 		
-		// doubly even test with file		
+		// // doubly even test with file		
 		demo.startTimer("Test3");
 		File doublyEvenTest = new File("message.txt");
 		cypherFile(doublyEvenTest);
@@ -107,6 +108,8 @@ public class MagicCypherDemo {
 		cypherFile(romeoTest);
 		demo.endTimer("Test4");
 		System.out.println(String.format("%.4f seconds to cypher message.", demo.getTime("Test4")));
+
+		 
 		
 		// Test 2) Text file of T. Smollett's "The Expedition"
 		demo.startTimer("Test5");

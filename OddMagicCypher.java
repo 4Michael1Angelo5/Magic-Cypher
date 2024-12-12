@@ -158,7 +158,7 @@ public class OddMagicCypher extends MagicCypher {
         return decryptedMessage;
     }
 
-    //@TODO: consider refactoring the logic. traverseSquare method is essentially the same as the buildSquare method
+    // @TODO: consider refactoring the logic. traverseSquare method is essentially the same as the buildSquare method
     // maybe consolidate the code so that one method is used for both encryption and decryption.
     // one possibility is to have buildSquare or traverseSquare return [row, column] pairs instead of having seperate 
     // methods that essentially do the same thing. 

@@ -4,7 +4,7 @@ import java.util.Map;
 
 // Encryption:
 
-// SinglyEvenMagicCypher class produces an singly even magic square filled with
+// SinglyEvenMagicCypher class produces a singly even magic square filled with
 // char's from a message. It reads each row of the square and concatenates the chars
 // to produce a ciphered text. The chars are mapped by their corresponding position
 // in the string message. IE the number 1 corresponds to the first letter in the message
@@ -276,7 +276,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     // which one is better ?
     // combine the 4 differnt odd magic squares into one square following the
     // pattern
-
     private void combineSquares() {
 
         // A C
@@ -413,6 +412,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
     // step 5)
     private void rightSideRowColumnSwapOperations(){
+        // row column swap operations
 
 
         // right side row swaping
@@ -513,7 +513,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
     }
 
-    //**************************************************************************************************
+    // **************************************************************************************************
     // ******************************************Decryption*********************************************
 
     // constructor for decryption
@@ -618,6 +618,8 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     protected String readSquares(){
         // create 4 oddMagicCypher objects for us to decrypt using 
         // OddMagicCypher's decryption constructor
+
+        //String concatenation does not run in constant time USE STRING BUILDER for large strings!
         StringBuilder decryptedMessage = new StringBuilder();
 
         //==================== upper left square =======================================
@@ -645,10 +647,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         // A  C     A = 1:N^2/4            C = 2*N^2/4+1: 3N^2/4
         // D  B     B = N^2/4+1 : 2*N^2/4  D = 3N^2/4+1 : N^2
 
-        //          A              B              C                 D
-
-        // return uppleftText + lowerRightText + upperRightText + lowerLeftText;
-
         decryptedMessage.append(uppleftText)    // A 
                         .append(lowerRightText) // B
                         .append(upperRightText) // C
@@ -656,8 +654,6 @@ public class SinglyEvenMagicCypher extends MagicCypher {
 
         return decryptedMessage.toString();
         
-     
     }
-
 
 }

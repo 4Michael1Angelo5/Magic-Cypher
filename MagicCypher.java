@@ -1,18 +1,29 @@
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-// import java.lang.StringBuilder;
+import java.util.Map; 
+
+
+// **************************************************************************************************************
+
+// CS 143 Final Code Project
+// Professor David Anderson
+// Chris Chun & Jake
+
+// MagicCypher is a Java application that allows users to input a message and convert it into ciphered text.
+// Its algorithm uses the properties of magic squares, where the sum of each column, row, and main diagonal
+// are equal. It treats each character in the message as an integer corresponding to its position as it appears
+// in the message. In arranges the letters in a square the same way numbers are placed inside magic squares, 
+//then reads each row of the square to produce the cipher. MagicCypher can handle both plain text input and 
+//text files, making it versatile for different use cases. MagicCypher uses a reverse process to handle decryption.
+
+// **************************************************************************************************************
 
 public class MagicCypher {
-
-    // ************************************************************************************************
 
     // order of magic square
     protected int order;
@@ -32,7 +43,11 @@ public class MagicCypher {
     // ledger of what's been added to our orignal message we are trying to encrypt.
     protected Map<Integer, String> ledgerMap = new HashMap<>();
 
-    // ************************************************************************************************* 
+    // ============== empty constructor =======================
+
+    // Magic Cypher does not have a constructor. Having a constructor that
+    // takes String or File creates a cicrular dependecy when MagicCypher
+    // determines which child class to hand off encryption logic to.
 
     // =============== setters ========================
 
@@ -44,18 +59,9 @@ public class MagicCypher {
         this.square = magicSquare;
     }
 
-    private void setOrder(int order) {
-        this.order = order;
-    }
-
     private void setCharMapList(ArrayList<Map<Integer,String>> charMapList){
         this.charMapList = charMapList;
     }
-
-    // ============== empty constructor =======================
-
-    //@TODO explain the design descion to make the constructor is empty
-
 
     // =============== meat and potatoes ======================
 
@@ -501,8 +507,7 @@ public class MagicCypher {
 
                 // add up all the keys in each row
 
-                // get the key in each cell @TODO can this be faster if I know there is always
-                // only one map in each column
+                // get the key in each cell
                 for (Integer key : cellInRow.keySet()) {
                     // the keys represnt the index of the char in the string
                     // because they are zero indexed we need to add 1 to each key
@@ -532,7 +537,7 @@ public class MagicCypher {
                 // was not performed
                 // correctly
 
-                throw new IllegalStateException("column: " + (i + 1) + " does not equal the magic constant ");
+                throw new IllegalStateException("Column: " + (i + 1) + " does not equal the magic constant ");
 
             }
 
@@ -541,7 +546,9 @@ public class MagicCypher {
 
         }
         if (!isDiagonalsMagic(magicSquare, magicConstant)) {
-
+            
+            // throw Illegal state exception here because the state of the program does not make sense at this point
+        
             throw new IllegalStateException("one of the diagonals does not equal the magic constant ");
         }
 
