@@ -29,13 +29,10 @@ public class DoublyEvenMagicCypher extends MagicCypher {
         // step 1 build the square from the char map list
         buildSquare();
         
-        // step 2 transpose for enhanced obfusication
-        System.out.println("before transpose");
-        // printSquare(magicSquare);
+        // step 2 transpose for enhanced obfusication 
         transpose();
          
-         
-        // step 3)  read each row line by line and cocatenate the result
+        // step 3)  read each row line by line and concatenate the result
         String cipherdText = readSquare(magicSquare); // inherited from parent 
 
         // steo 4)  return the ciphered text
@@ -79,7 +76,8 @@ public class DoublyEvenMagicCypher extends MagicCypher {
     
     //step 1)
     protected void buildSquare() {
-        // this method uses builds magic squares doubly even magic squares
+        // this method builds a doubly even magic square
+        // and places the char map in each cell
         
         // short hand 
         int N = this.order;
@@ -109,23 +107,12 @@ public class DoublyEvenMagicCypher extends MagicCypher {
                     
                     // get the key (char index) from  the charMapList using rightCounter's value 
                     // int charIndex = charMapList.get(countRight).keySet().iterator().next();
-                    
-
-                    // String charInMessage = charMapList.get(countRight).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
+                  
                     magicSquare.get(i).get(j).put(indexRight, charRight);
 
                 } else if (i < N / 4 && j >= N - N / 4) {
                     // upper right square
                     // square[i][j] = countRight;
-
-
-                    // int charIndex = charMapList.get(countRight).keySet().iterator().next();
-
-                    // String charInMessage = charMapList.get(countRight).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
 
                     magicSquare.get(i).get(j).put(indexRight, charRight);
 
@@ -133,23 +120,11 @@ public class DoublyEvenMagicCypher extends MagicCypher {
                     // middle 4 squares
                     // square[i][j] = countRight;
 
-                    // int charIndex = charMapList.get(countRight).keySet().iterator().next();
-
-                    // String charInMessage = charMapList.get(countRight).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
-
                     magicSquare.get(i).get(j).put(indexRight, charRight);
 
                 } else if (i >= N - N / 4 && j < N / 4) {
                     // lower left squares
                     // square[i][j] = countRight;
-
-                    // int charIndex = charMapList.get(countRight).keySet().iterator().next();
-
-                    // String charInMessage = charMapList.get(countRight).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
 
                     magicSquare.get(i).get(j).put(indexRight, charRight);
 
@@ -157,26 +132,12 @@ public class DoublyEvenMagicCypher extends MagicCypher {
                     // lower right squares
                     // square[i][j] = countRight;
 
-                    // int charIndex = charMapList.get(countRight).keySet().iterator().next();
-
-                    // String charInMessage = charMapList.get(countRight).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
-
                     magicSquare.get(i).get(j).put(indexRight, charRight);
 
                 } else {
                     // fill it with left counter 
                     // square[i][j] = countLeft;
                     
-                    // get the key (char index) from  the charMapList using leftCounter's value 
-                    // int charIndex = charMapList.get(countLeft).keySet().iterator().next();
-                    
-                    // // get the char value to the corresponding key
-                    // String charInMessage = charMapList.get(countLeft).entrySet().iterator().next().getValue();
-
-                    // magicSquare.get(i).get(j).put(charIndex, charInMessage);
-
                     magicSquare.get(i).get(j).put(indexLeft, charLeft);
 
                 }
@@ -207,7 +168,6 @@ public class DoublyEvenMagicCypher extends MagicCypher {
             tempSquare.add(column);
         } 
 
-        magicSquare.clear(); // is this even neccessary?
         this.magicSquare = tempSquare;
     }
 
@@ -224,27 +184,36 @@ public class DoublyEvenMagicCypher extends MagicCypher {
     protected String decyptMessage(ArrayList<ArrayList<Map<Integer, String>>> square){
 
         //step 1) transpose the matrix (interchange row and columns)
-        //step 2)
         transpose(); 
-        // System.out.println("after transpose in decryption\n");
-        // printSquare(magicSquare);
+        
+        //step 2) traverse the square using the same encrypion logic
         String decryptedMessage = traverseSquare();
-        //step 3
+        
         return decryptedMessage;
     }
-
-
-
+    
     protected String traverseSquare(){
+        // traverse square traverses the square in the same pattern
+        // used for encryption but gets the character stored in each cell
+        // and places the character in it's corresponding index into an array
+        // then itterates over the array concatenating each character to form
+        // a decrypted message. 
+        
+        // it depends on the magicSquare field which get ininitlized in the decyption constructor. 
+  
 
         int N = this.order;
         int descendingCount = N*N-1;
         int ascendingCount = 0; 
-
+        
+        // create an array to store the characters
         String[] decryptedMesssageArray = new String[N*N];
-        String decryptedMesssage="";
 
-        //flag
+        // initilize a decryptedMesssage string for us to concatenate 
+        StringBuilder decryptedMesssage = new StringBuilder();
+        // String decryptedMesssage="";
+
+        //flag to determin which rule was used
         boolean useDescendingCount = true;  
 
         for (int i = 0; i < N; i++) {
@@ -291,6 +260,9 @@ public class DoublyEvenMagicCypher extends MagicCypher {
              
                 }
                 
+                // determine if we used acending or descending counter
+                // and fill decrypted message array with that char
+                // in the corresponding position from the counter.
                 if(useDescendingCount==true){
                     
                     decryptedMesssageArray[descendingCount] = charInCell;
@@ -305,11 +277,14 @@ public class DoublyEvenMagicCypher extends MagicCypher {
             }
 
         } 
-
+        
+        // itterate over the decryptedMessage array and concatenate the final result
+        // to form a decrypted message
         for(int i = 0 ; i< N*N ; i ++ ){
-            decryptedMesssage+=decryptedMesssageArray[i];
+            // decryptedMesssage+=decryptedMesssageArray[i];
+            decryptedMesssage.append(decryptedMesssageArray[i]);
         }
 
-        return decryptedMesssage;
+        return decryptedMesssage.toString();
     }
 }

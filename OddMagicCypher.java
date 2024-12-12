@@ -143,7 +143,7 @@ public class OddMagicCypher extends MagicCypher {
     OddMagicCypher(int order, ArrayList<ArrayList<Map<Integer, String>>> square){
         this.order = order;     // order of square 
         this.square = square;   // square filled with encrypted message
-        this.cellOccupancy = new boolean[order][order]; // 2d matrix of booleans to determin occupancy of cells
+        this.cellOccupancy = new boolean[order][order]; // 2d matrix of booleans to determine occupancy of cells
     }
     
     //decryption main method   
@@ -176,8 +176,9 @@ public class OddMagicCypher extends MagicCypher {
         int i = 0; // i starts in the first row
         int j = middleColumn; // j starts in the middle column
         int indexOfChar = 0; // index of characters in the message
-
-        String decryptedMessage ="";
+        
+        //more effecient then String concatenation
+        StringBuilder decryptedMessage = new StringBuilder();
 
         while (indexOfChar < N * N) {
             
@@ -191,8 +192,8 @@ public class OddMagicCypher extends MagicCypher {
             // get cell in column j of row i             
             Map<Integer, String> cell = row.get(j);
             
-            // concatenate the message
-            decryptedMessage += ""+cell.entrySet().iterator().next().getValue();
+            // concatenate the message 
+            decryptedMessage.append(cell.entrySet().iterator().next().getValue());
             
             //mark the cell as being occupied
             cellOccupancy[i][j] = true;
@@ -248,6 +249,6 @@ public class OddMagicCypher extends MagicCypher {
         }
  
         
-        return decryptedMessage;
+        return decryptedMessage.toString();
     }
 }

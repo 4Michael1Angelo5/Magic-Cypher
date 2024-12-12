@@ -49,6 +49,7 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         this.charMapList = charMapList;
         // an empty magic square that we will fill
         this.magicSquare = magicSquare;
+         
     }
     
     // encryption main method
@@ -617,7 +618,8 @@ public class SinglyEvenMagicCypher extends MagicCypher {
     protected String readSquares(){
         // create 4 oddMagicCypher objects for us to decrypt using 
         // OddMagicCypher's decryption constructor
-        
+        StringBuilder decryptedMessage = new StringBuilder();
+
         //==================== upper left square =======================================
     
         OddMagicCypher  upperLeftOddMagicSquare = new OddMagicCypher(order, upperleftSquare);
@@ -644,7 +646,16 @@ public class SinglyEvenMagicCypher extends MagicCypher {
         // D  B     B = N^2/4+1 : 2*N^2/4  D = 3N^2/4+1 : N^2
 
         //          A              B              C                 D
-        return uppleftText + lowerRightText + upperRightText + lowerLeftText;
+
+        // return uppleftText + lowerRightText + upperRightText + lowerLeftText;
+
+        decryptedMessage.append(uppleftText)    // A 
+                        .append(lowerRightText) // B
+                        .append(upperRightText) // C
+                        .append(lowerLeftText); // D
+
+        return decryptedMessage.toString();
+        
      
     }
 

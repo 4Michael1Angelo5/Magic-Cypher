@@ -6,15 +6,15 @@ MagicCypher is a Java-based encryption tool that utilizes the properties of magi
 
 - **Magic Square Encryption**: Uses the structure of magic squares (odd, singly even, and doubly even) to encrypt messages.
 - **Customizable Input**: Accepts both string input and file input for encryption.
-- **Message Sanitization**: Cleans up input messages by trimming white spaces and padding with random characters to fit the magic square.
+- **Message Sanitization**: Cleans up input messages by trimming white spaces and padding with characters to fit the magic square.
 - **Validation**: Includes checks to ensure the magic properties of the encryption are maintained (sums of rows, columns, and diagonals).
 
 ## How It Works
 
 1. **Sanitize the Message**  
    - Remove any leading or trailing white spaces.
-   - Insert random characters between spaces of words.
-   - Add additional random characters to the end of the message so that the final length of the message is a square number (e.g., 9, 16, 25, 36, etc.).
+   - Insert characters between spaces of words.
+   - Add additional characters to the end of the message so that the final length of the message is a square number (e.g., 9, 16, 25, 36, etc.).
 
 2. **Determine the Order of the Square Matrix**  
    - Calculate the order of the square matrix based on the length of the sanitized string.
@@ -28,7 +28,7 @@ MagicCypher is a Java-based encryption tool that utilizes the properties of magi
    - The user interacts only with the parent class, **MagicCypher**; it manages the selection of the child class internally.
 
 4. **Generate Character Map**
-   - Creates a map of character's in the message  along with its position index in the orginal message.
+   - Creates a map of character's in the message along with its position index in the orginal message.
 
 5. **Generate the Magic Square**  
    - Each child class uses its algorithm to generate a magic square of the specified order.

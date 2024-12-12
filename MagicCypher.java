@@ -1,9 +1,14 @@
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+// import java.lang.StringBuilder;
 
 public class MagicCypher {
 
@@ -14,83 +19,20 @@ public class MagicCypher {
     // ciphered message
     protected String message;
 
-    // keep track of where we've added random char for decryption
-    private ArrayList<Integer> indicesOfWhiteSpace = new ArrayList<>();
-
     // array list (rows) of maps containing key values of an integer (column) and a
     // map
     // containing key values of an Integer (index of char in message) and a string
     // (the char in the message)
-    public ArrayList<ArrayList<Map<Integer, String>>> square = new ArrayList<>();
+    protected ArrayList<ArrayList<Map<Integer, String>>> square = new ArrayList<>();
 
     // a map of all the string charaters in the message and thier index posiition
 
-    public ArrayList<Map<Integer, String>> charMapList = new ArrayList<>();
+    protected ArrayList<Map<Integer, String>> charMapList = new ArrayList<>();
 
     // ledger of what's been added to our orignal message we are trying to encrypt.
     protected Map<Integer, String> ledgerMap = new HashMap<>();
 
-    // *************************************************************************************************
-
-    // main method testing
-
-    public static void main(String[] args) {
-
-        //odd cypher
-        MagicCypher myCypher = new MagicCypher();
-        myCypher.encryptMessage(
-                                "All you who sleep tonight " + 
-                                "Far from the ones you love, " + 
-                                "No hand to left or right " + 
-                                 "And emptiness above " + 
-                                 
-                                "Know that you aren't alone " + 
-                                "The whole world shares your tears, " + 
-                                "Some for two nights or one, " + 
-                                "And some for all their years. "
-                                );// poem by Vikram Seth
-
-         System.out.println("The order of your message is: " + myCypher.order+"\n");
-
-         int key1 = (int) myCypher.calculateMagicConstant(myCypher.order);
-
-         String decryptedMessage = myCypher.decryptMessage(myCypher.message, key1);
-
-         System.out.println(decryptedMessage);
-
-         // singly even with file
-        File file = new File("ghettoScholar.txt");
-        MagicCypher cipher2 = new MagicCypher();
-
-        cipher2.encryptMessage(file);  
-
-        System.out.println("The order of your message is: " + cipher2.order + "\n");
-
-        int key = (int) cipher2.calculateMagicConstant(cipher2.order);
-
-        String decryptedMessage1 = cipher2.decryptMessage(cipher2.message,key);
-
-        System.out.println(decryptedMessage1);
-
-        //doubly even with file
-
-        File file2 = new File("message.txt");
-        MagicCypher cipher3 = new MagicCypher();
-
-        cipher3.encryptMessage(file2);  
-
-        System.out.println("The order of your message is: " + cipher3.order + "\n");
-
-        int key3 = (int) cipher3.calculateMagicConstant(cipher3.order);
-
-        String decryptedMessage2 = cipher3.decryptMessage(cipher3.message,key3);
-
-        System.out.println(decryptedMessage2);
-
-
-
-
-    }
+    // ************************************************************************************************* 
 
     // =============== setters ========================
 
@@ -98,20 +40,26 @@ public class MagicCypher {
         this.message = message;
     }
 
-    protected void setSquare(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
+    private void setSquare(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
         this.square = magicSquare;
     }
 
-    protected void setOrder(int order) {
+    private void setOrder(int order) {
         this.order = order;
+    }
+
+    private void setCharMapList(ArrayList<Map<Integer,String>> charMapList){
+        this.charMapList = charMapList;
     }
 
     // ============== empty constructor =======================
 
+    //@TODO explain the design descion to make the constructor is empty
+
 
     // =============== meat and potatoes ======================
 
-    private String encryptMessage(String message) {
+    protected String encryptMessage(String message) {
 
         // 1) remove any leading or trailing white space
         message = message.trim();
@@ -140,10 +88,10 @@ public class MagicCypher {
     }
 
     // same as above but for files
-    private String encryptMessage(File file) {
+    protected String encryptMessage(File file) {
 
-        // 0) read the message
-        String readMessage = readFile(file);
+        // 0) read the message 
+        String readMessage = readFile(file); 
 
         // 1 remove any leading or trailing white space
         readMessage = readMessage.trim();
@@ -172,49 +120,41 @@ public class MagicCypher {
     }
     // ========== steps  ============
 
+    
     // step 0)
 
     // Helper method for MagicCypher to read file input
-    private String readFile(File file) {
+    private String readFile(File file){
+        
+        // initilize a string builder more efficient than string concatenation 
+        StringBuilder message = new StringBuilder();
 
-        String message = "";
-        String lineBreak;
+        try{
+            
+            // used buffered reader with a file reader 
+            // b/c it's more effecient than a Scanner
+            BufferedReader reader = new BufferedReader( new FileReader(file));
+    
+            String nextLine;
 
-        try {
-            // Create a Scanner object to read the file
-            Scanner scanner = new Scanner(file);
+            try{
 
-            // Read the file line by line
-            while (scanner.hasNextLine()) {
-                if (scanner.hasNextLine()) {
-                    // adjust for line breaks
-                    lineBreak = " "; 
- 
-                } else {
-                    lineBreak = "";
+                while( (nextLine = reader.readLine())!= null){
+
+                    message.append(nextLine);
+
                 }
-
-                String line = scanner.nextLine();
-
-                // add a white space between
-                // lines other wise:
-                // Hello
-                // World
-                // Becomes "HelloWorld" instead of "Hello World"
-
-                // concatenate
-                message += line + lineBreak;
-                // message += line;
+            // handle exceptions thrown by FileReader
+            }catch(IOException e){
+                e.printStackTrace();
             }
-
-            // close the scanner
-            scanner.close();
-
-            // deal with not being able to find the file
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + e.getMessage());
+            
+        // handle exceptions thrown by BufferedReader
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
         }
-        return message;
+
+        return message.toString();
     }
 
     // step 2)
@@ -245,30 +185,21 @@ public class MagicCypher {
     private String sanitizeMessage(String message) {
         // clean up the message to get ready for encryption
 
-        // @TODO: optimize so that it doesn't loop if there are no whitespaces
-        // or maybe put that check before we even get here
-        // maybe use regEx?
-
-        String tempMessage = "";
-        String comparisonString;
-        int indexOfWhiteSpaceInMessage; // @TODO finish this
+        // String tempMessage = "";
+        StringBuilder tempMessage = new StringBuilder();
+        String comparisonString; 
         for (int i = 0; i < message.length(); i++) {
 
             comparisonString = "" + message.charAt(i);
 
             if (comparisonString.equals(" ")) {
 
-                // fill in spaces between words with random char
-                tempMessage += "X";
+                // fill in spaces between words with a char
+                tempMessage.append("_");
 
-                // @TODO this should actually fill it with a random char;
-                // Jake you wanna tackle this one?
-
-                // @TODO add the index of where in the string we've added a random char
-
-            } else {
-                tempMessage += comparisonString;
-
+            } else { 
+                // otherwise its a char we need to append
+                tempMessage.append(comparisonString);
             }
         }
 
@@ -276,14 +207,10 @@ public class MagicCypher {
         // ie continue adding random char's until it is length is n^2
 
         while (tempMessage.length() < order * order) {
-
-            tempMessage += "Z";
-            // @TODO this should actually fill it with a random char;
-            // @TODO need to keep track of what we've added so that it
-            // isn't included in decryted message.
-
+ 
+            tempMessage.append("_");
         }
-        return tempMessage;
+        return tempMessage.toString();
     }
 
     // step 4)
@@ -294,6 +221,9 @@ public class MagicCypher {
         // key: index of char in message
         // value: char in message
 
+        //create a temporary ArrayList to store our message
+        ArrayList<Map<Integer,String>> newCharArrayList = new ArrayList<>();
+
         int index = 0;
 
         while (index < message.length()) {
@@ -302,10 +232,26 @@ public class MagicCypher {
 
             charMap.put(index, "" + message.charAt(index));
 
-            charMapList.add(charMap);
+            newCharArrayList.add(charMap);
 
             index++;
         }
+        
+        //this line of code is important!
+        setCharMapList(newCharArrayList);
+
+        // do not directly mutate the state of the application!
+        // example:  
+        // say a user creates a cipher object. 
+        // they feed it a message to encrypt.
+        // MagicCipher creates the decrypted message, boom done
+        // but then the user wants to create another encrypted message with
+        // the same MagicCyper Object they just created. 
+        // if we directly manipulate this.charMapList then the ArrayList grows
+        // and the new AraryList will contain characters from both messages. 
+
+        // this line of code ensures the application is flexible and now the user can 
+        // encrypt multiple messages with the same MagicCypher object.
     }
 
     // step 5
@@ -327,7 +273,7 @@ public class MagicCypher {
         // squares to build its singly even magic square
         // with each call square's value will grow becuase it reference persists between
         // child and parent even when you create new
-        // differnt new OddMagicCypher Object becuase they both share the same parent.
+        // differnt OddMagicCypher Objects becuase they both share the same parent.
 
         for (int i = 0; i < order; i++) {
 
@@ -358,19 +304,35 @@ public class MagicCypher {
     private String determineCypherAlgorithm() {
         // determin which child class to pass the encription logic off to 
         // based on the order of the square.   
+        
+        System.out.println("Determining cipher algorithm for encryption...\n");
 
         if (order % 2 == 0) {
 
             if (order % 4 == 0) {
                 // doubly even case
 
-                System.out.println("\nusing doubly even magic cypher\n");
+                System.out.println("Using doubly even magic cypher\n");
 
                 // create new doubly even magic cypher to handle encryption logic 
                 DoublyEvenMagicCypher doublyEvenCypher = new DoublyEvenMagicCypher(order, square, charMapList);
 
                 // call generateCypher method to run the encryption
                 String cypheredText = doublyEvenCypher.generateCypher();
+                
+                System.out.println("Generating Magic Cipher\n");
+
+                try{
+
+
+                    simulateLoaderBar(42, 60);
+
+                }
+                catch(InterruptedException e){
+
+                    System.out.println(e);
+
+                }
 
                 printSquare(doublyEvenCypher.magicSquare);
                 
@@ -389,13 +351,26 @@ public class MagicCypher {
             } else {
                 // singly even case
 
-                System.out.println("\nusing singly even magic cypher...\n");
+                System.out.println("Using singly even magic cypher...\n");
                 
                 // create new singly even magic cypher to handle encryption logic 
                 SinglyEvenMagicCypher singlyEvenMagicCypher = new SinglyEvenMagicCypher(order, charMapList, square);
 
                 // call generateCypher method to run the encryption
                 String cipheredText = singlyEvenMagicCypher.generateCypher();
+
+                try{
+
+                    System.out.println("Generating Magic Cipher\n");
+
+                    simulateLoaderBar(42, 60);
+
+                }
+                catch(InterruptedException e){
+
+                    System.out.println(e);
+
+                }
 
                 printSquare(singlyEvenMagicCypher.magicSquare);
                 
@@ -415,7 +390,7 @@ public class MagicCypher {
         } else if (order % 2 == 1) {
             // odd case
 
-            System.out.println("\nusing odd encryption butter\n");
+            System.out.println("using odd encryption butter\n");
 
             // create new odd Magic Cypher object to handle encryption logic
             OddMagicCypher oddCypher = new OddMagicCypher(order, charMapList, square);
@@ -423,13 +398,24 @@ public class MagicCypher {
             // call generateCypher Method to run the encryption
             String cypheredText = oddCypher.generateCypher();
 
-            
-            // this check needs to go here becuase I don't want 
-            // it in odd magic Cypher class becuase every time signly even Magic cypher creates a new 
-            // square the test will fail. 
+            try{
+
+                System.out.println("Generating Magic Cipher\n");
+
+                simulateLoaderBar(42, 60);
+
+            }
+            catch(InterruptedException e){
+
+                System.out.println(e);
+
+            }
 
             printSquare(oddCypher.square);
 
+            // this check needs to go here becuase I don't want 
+            // it in odd magic Cypher class becuase every time signly even Magic cypher creates a new 
+            // square the test will fail. 
             if(isMagic(oddCypher.square)){
 
                 setSquare(oddCypher.square);
@@ -446,14 +432,13 @@ public class MagicCypher {
     }
 
 
-    // helper methods 
+// helper methods ===================================================================================
 
     // calculatMagicConstant;
-    protected double calculateMagicConstant(double order) {
+    protected int calculateMagicConstant(int order) {
         // the magic constant is the number every row, column, and diagonal sum to. 
 
-        double n = order;
-
+        int n = order;
 
         return n * (n * n + 1) / 2;
 
@@ -475,7 +460,6 @@ public class MagicCypher {
     // properties
     protected boolean isMagic(ArrayList<ArrayList<Map<Integer, String>>> magicSquare) {
 
-
         // this method loops through each row and column of the array list
         // and iterates over every key in the list and adds them up to see if they equal
         // the magic constant
@@ -486,23 +470,22 @@ public class MagicCypher {
 
         System.out.println("\nChecking the validity of the algorithm... \n ");
 
-        // @TODO implement a cool UX here where it goes step by step an shows you what its doing
-        // IDEAS: it would be cool if we set a timestamp at the begining of the function and implemented 
-        //  a loading bar using "*" or something so that a star would get printed out every half second 
-        // then it would go step by step and be like checking all rows and columns .... 
-        // now checking all diagonals .... 
-        // then print the final message which says something like algorithm perofmred corecetly.
-
-    
-        // System.out.println("checking order from insie isMagic in parent: "+this.order); 
-        //why is this zero when child classes are calling it but not when the parent calls it? 
+        //UI/UX feature loading bar
+        try{
+            simulateLoaderBar(42, 60);
+        }
+        catch(InterruptedException e){
+            System.out.println(e);
+        }
 
         Map<Integer, String> cellInColumn = new HashMap<>();
         Map<Integer, String> cellInRow = new HashMap<>();
 
         int sumRow;
         int sumColumn;
-        double magicConstant = calculateMagicConstant(magicSquare.size());
+        int magicConstant = calculateMagicConstant(magicSquare.size());
+
+
         for (int i = 0; i < magicSquare.size(); i++) {
 
             sumRow = 0;
@@ -543,7 +526,7 @@ public class MagicCypher {
 
                 throw new IllegalStateException("Row: " + (i + 1) + " does not equal the magic constant ");
 
-            }
+            } 
             if (sumColumn != magicConstant) {
                 // if the sum in a column is not equal to the magic constant then the algorithm
                 // was not performed
@@ -564,6 +547,12 @@ public class MagicCypher {
 
         // if all these tests passed then the encryption algorithm was performed
         // correctly
+        
+        //success message 
+        System.out.println("All the rows equal the magic constant\n");
+        System.out.println("All the columns equal the magic constant\n");
+        System.out.println("Both Diagonals equal the magic constant\n");      
+
         System.out.println("Magic Cipher Algorithm performed correctly\n");
         return true;
     }
@@ -631,10 +620,13 @@ public class MagicCypher {
     protected String readSquare(ArrayList<ArrayList<Map<Integer, String>>> square) {
         // read each row line by line and concatenate the string values of each map
         // to form a ciphered text
-
+        
+        //row
         ArrayList<Map<Integer, String>> row = new ArrayList<>();
-        String cipheredText = "";
-        String nextChar;
+        
+        // string builder more effecien then string concatenation
+        StringBuilder cipheredText = new StringBuilder();
+  
 
         for (int i = 0; i < square.size(); i++) {
 
@@ -644,21 +636,19 @@ public class MagicCypher {
             for (int j = 0; j < square.size(); j++) {
 
                 // get the first key value of the cell in the column of row i
-                nextChar = row.get(j).entrySet().iterator().next().getValue();
-
-                // concatenate the message
-                cipheredText += nextChar;
+                cipheredText.append(row.get(j).entrySet().iterator().next().getValue());
             }
         }
 
         // return the ciphered text
-        return cipheredText;
+        return cipheredText.toString();
     }
 
     private String determineDecryptionAlgorithm(int order, ArrayList<ArrayList<Map<Integer,String>>> square){
         // determins which decryption algorithm to use and uses it
         // return the decrypted message; 
-        System.out.println("Determining cipher algorithm for decryption...\n");
+        System.out.println("\nDetermining cipher algorithm for decryption...");
+        
  
         if(order%2==0){
 
@@ -712,6 +702,7 @@ public class MagicCypher {
         // this method is used by decryptMessage to determin if a message is 
         // a valid cipher
 
+        //check if the message length is a square number eg: 9,16,25...
         if(isSquare(message.length())){ 
             return true;
         }else{
@@ -738,7 +729,6 @@ public class MagicCypher {
     // step 3) 
     private static ArrayList< ArrayList< Map<Integer,String>>> stringToSquare(String message){
         //constructs a 2d arraylist of maps cotaining the letter and index of the char in the message
-
 
         ArrayList< ArrayList< Map<Integer,String>>> square = new ArrayList<>();
 
@@ -790,11 +780,21 @@ public class MagicCypher {
                 // step 4) feed the square to determineDecryptionAlgorithm
                 String decryptedMessage = determineDecryptionAlgorithm(order, cipheredSquare);
 
-                // step 5) @TODO clean up the message if possible 
+                // step 5) return the message and simulate the loaer bar for improved UX
+
+                try{
+                    simulateLoaderBar(42, 60);
+                    
+                }
+                catch(InterruptedException  e){
+                    System.out.println(e);
+                }
 
                 System.out.println("Your decrypted message is: \n");
+
+                System.out.println(decryptedMessage+"\n");
                 
-                return decryptedMessage +"\n"; 
+                return decryptedMessage;
             
             }
         }
@@ -802,9 +802,59 @@ public class MagicCypher {
         //default behavior 
         // if an invalid message is provided, return the message
         // but it will never get here becuase if it fails the previous
-        // checks then it will throw an exception
+        // checks then it will throw an exception   
+
+        System.out.println("An error occured trying to decrypt the following message: \n");
+
+        System.out.println(message+"\n");
+
         return message;
 
     }
+
+    /**
+     * Simulates a loader bar in the console.
+     *
+     * @param totalSteps   the total number of steps for the loader to complete
+     * @param delayMillis  the delay in milliseconds between each step
+     * @throws InterruptedException if the thread sleep is interrupted
+     */
+    
+    public static void simulateLoaderBar(int totalSteps, int delayMillis) throws InterruptedException {
+            
+    // loaderbar feature written with help from chatgpt
+    // Example: simulateLoaderBar(50, 100) => 50 steps with a delay of 100ms per step 
+    
+
+        int barWidth = 100; // Length of the loader bar
+
+        System.out.println("Loading...");
+
+        for (int step = 0; step <= totalSteps; step++) {
+            int progress = (step * barWidth) / totalSteps;
+            StringBuilder loader = new StringBuilder();
+
+            loader.append("[");
+            for (int i = 0; i < barWidth; i++) {
+                if (i < progress) {
+                    loader.append("=");
+                } else if (i == progress) {
+                    loader.append(">");
+                } else {
+                    loader.append(" ");
+                }
+            }
+            loader.append("]");
+
+            int percentage = (step * 100) / totalSteps;
+
+            // Overwrite the current line with the loader bar and percentage
+            System.out.print("\r" + loader + " " + percentage + "%");
+
+            Thread.sleep(delayMillis);
+        }
+
+        System.out.println("\nDone!\n");
+    }    
 
 }
